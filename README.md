@@ -13,4 +13,4 @@ This content pack adds an input and extractors for handling the syslog feed from
 
 ## Requirements
 
-Cylance PROTECT configured to send syslog TCP data on Graylog on port 6514.
+Cylance PROTECT configured to send syslog TCP data to Graylog on port 6514.

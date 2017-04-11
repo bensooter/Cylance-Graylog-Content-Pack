@@ -1,179 +1,212 @@
-{  
-   "name":"Cylance Graylog Content Pack",
-   "description":"Graylog Content Pack for Cylance PROTECT",
-   "category":"Anti-Virus",
-   "inputs":[  
-      {  
-         "title":"Cylance Syslog TCP",
-         "configuration":{  
-            "recv_buffer_size":1048576,
-            "tcp_keepalive":false,
-            "use_null_delimiter":false,
-            "tls_client_auth_cert_file":"",
-            "force_rdns":false,
-            "bind_address":"0.0.0.0",
-            "tls_cert_file":"",
-            "store_full_message":false,
-            "expand_structured_data":false,
-            "port":6514,
-            "tls_key_file":"",
-            "tls_enable":false,
-            "tls_key_password":"",
-            "max_message_size":2097152,
-            "tls_client_auth":"disabled",
-            "override_source":null,
-            "allow_override_date":true
-         },
-         "static_fields":{  
-
-         },
-         "type":"org.graylog2.inputs.syslog.tcp.SyslogTCPInput",
-         "global":false,
-         "extractors":[  
-            {  
-               "title":"Cylance ThreatClassification Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Threat Class: %{WORD:threat_class}, Threat Subclass: %{WORD:threat_subclass}, SHA256: %{WORD:sha256}, MD5: %{WORD:md5}"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"ThreatClassification",
-               "order":0
-            },
-            {  
-               "title":"Cylance ExploitAttempt Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{WORD:device_name}, IP Address: \\(%{IP:source_address}(?:,\\s*%{IP:dest_address})?\\), Action: %{WORD:action}, Process ID: %{WORD:process_id}, Process Name: %{DATA:process_name}, User Name: %{DATA:user_name}, Violation Type: %{DATA:violation_type}, Zone Names: \\(%{DATA:zone_names}\\)"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"ExploitAttempt",
-               "order":0
-            },
-            {  
-               "title":"Cylance Threat Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{WORD:device_name}, IP Address: \\(%{IP:ip_address}\\), File Name: %{DATA:file_name}, Path: %{DATA:path}, Drive Type: %{DATA:drive_type}, SHA256: %{WORD:sha256}, MD5: %{WORD:md5}, Status: %{WORD:status}, Cylance Score: %{WORD:cylance_score}, Found Date: %{DATESTAMP2:found_date}, File Type: %{WORD:file_type}, Is Running: %{WORD:is_running}, Auto Run: %{WORD:auto_run}, Detected By: %{WORD:detected_by}, Zone Names: \\(%{DATA:zone_names}\\)"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"Threat",
-               "order":0
-            },
-            {  
-               "title":"Cylance LoginSuccess Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Message: %{DATA:messages}, Source IP: %{IP:source_ip}, User: %{GREEDYDATA:user}"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"LoginSuccess",
-               "order":0
-            },
-            {  
-               "title":"Cylance DeviceEdit Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Message: %{DATA:messages}, User: %{GREEDYDATA:user}"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"DeviceEdit",
-               "order":0
-            },
-            {  
-               "title":"Cylance Device Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{DATA:event_name},(?: Device Names: \\(%{DATA:device_names}\\),)?(?: Device Message: %{DATA:device_message},)? User: %{GREEDYDATA:user}"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"Device",
-               "order":0
-            },
-            {  
-               "title":"Cylance SystemSecurity Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{WORD:device_name}, Agent Version: %{DATA:agent_version}, IP Address: \\(%{IPV4:ipv4_address}(?:,\\s*%{IPV6:ipv6_address})?\\), MAC Address: \\(%{WORD:mac_address}\\), Logged On Users: \\(%{DATA:logged_on_users}\\), OS: %{GREEDYDATA:os}"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"SystemSecurity",
-               "order":0
-            },
-            {  
-               "title":"Cylance Alert Extractor",
-               "type":"GROK",
-               "cursor_strategy":"COPY",
-               "target_field":"",
-               "source_field":"message",
-               "configuration":{  
-                  "grok_pattern":"Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{DATA:device_name}, File Path: %{DATA:file_path}, Interpreter: %{WORD:interpreter}, Interpreter Version: %{DATA:interpreter_version}, Zone Names: \\(%{DATA:zone_names}\\)"
-               },
-               "converters":[  
-
-               ],
-               "condition_type":"STRING",
-               "condition_value":"Alert",
-               "order":0
-            }
-         ]
-      }
-   ],
-   "streams":[  
-
-   ],
-   "outputs":[  
-
-   ],
-   "dashboards":[  
-
-   ],
-   "grok_patterns":[  
-      {  
-         "name":"DATESTAMP2",
-         "pattern":"(%{DATE}[- ]%{TIME} ([AaPp][Mm]))"
-      }
-   ]
+{
+  "name": "Cylance Graylog Content Pack",
+  "description": "Graylog Content Pack for Cylance PROTECT",
+  "category": "Anti-Virus",
+  "inputs": [
+    {
+      "title": "Cylance Syslog TCP",
+      "configuration": {
+        "recv_buffer_size": 1048576,
+        "tcp_keepalive": false,
+        "use_null_delimiter": false,
+        "tls_client_auth_cert_file": "",
+        "force_rdns": false,
+        "bind_address": "0.0.0.0",
+        "tls_cert_file": "",
+        "store_full_message": false,
+        "expand_structured_data": false,
+        "port": 6514,
+        "tls_key_file": "",
+        "tls_enable": false,
+        "tls_key_password": "",
+        "max_message_size": 2097152,
+        "tls_client_auth": "disabled",
+        "override_source": null,
+        "allow_override_date": true
+      },
+      "static_fields": {},
+      "type": "org.graylog2.inputs.syslog.tcp.SyslogTCPInput",
+      "global": false,
+      "extractors": [
+        {
+          "title": "Cylance ThreatClassification Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Threat Class: %{WORD:threat_class}, Threat Subclass: %{WORD:threat_subclass}, SHA256: %{WORD:sha256}, MD5: %{WORD:md5}"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "ThreatClassification",
+          "order": 2
+        },
+        {
+          "title": "Cylance DeviceEdit Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Message: %{DATA:messages}, User: %{GREEDYDATA:user}"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "DeviceEdit",
+          "order": 3
+        },
+        {
+          "title": "Cylance Device Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{DATA:event_name},(?: Device Names: \\(%{DATA:device_names}\\),)?(?: Device Message: %{DATA:device_message},)? User: %{GREEDYDATA:user}"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "Device",
+          "order": 4
+        },
+        {
+          "title": "Cylance Alert Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{DATA:device_name}, File Path: %{DATA:file_path}, Interpreter: %{WORD:interpreter}, Interpreter Version: %{DATA:interpreter_version}, Zone Names: \\(%{DATA:zone_names}\\)"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "Alert",
+          "order": 5
+        },
+        {
+          "title": "Cylance CustomToken Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "full_message",
+          "configuration": {
+            "grok_pattern": " \\[%{WORD:custom_token}\\] Event Type:",
+            "named_captures_only": true
+          },
+          "converters": [],
+          "condition_type": "NONE",
+          "condition_value": "",
+          "order": 9
+        },
+        {
+          "title": "Cylance LoginSuccess Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Message: %{DATA:messages}, Source IP: %{IP:source_ip}, User: %{GREEDYDATA:user}"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "Event Name: LoginSuccess",
+          "order": 7
+        },
+        {
+          "title": "Cylance SystemSecurity Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{DATA:device_name}, Agent Version: %{DATA:agent_version}, IP Address: \\(%{IPV4:ipv4_address}(?:,\\s*%{IPV6:ipv6_address})*\\), MAC Address: \\(%{WORD:mac_address}\\), Logged On Users: \\(%{DATA:logged_on_users}\\), OS: %{GREEDYDATA:os}"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "SystemSecurity",
+          "order": 8
+        },
+        {
+          "title": "Event Type, Event Name, Device Name; this covers events like \"device registration\" and any events that aren't properly captured",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, (Device Name: %{DATA:device_name},)?"
+          },
+          "converters": [],
+          "condition_type": "REGEX",
+          "condition_value": "Event Type: .*, Event Name: .*",
+          "order": 0
+        },
+        {
+          "title": "Cylance ExploitAttempt Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{DATA:device_name}, IP Address: \\(%{IP:source_address}(?:,\\s*%{IP:dest_address})?\\), Action: %{WORD:action}, Process ID: %{WORD:process_id}, Process Name: %{DATA:process_name}, User Name: %{DATA:user_name}, Violation Type: %{DATA:violation_type}, Zone Names: \\(%{DATA:zone_names}\\)"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "ExploitAttempt",
+          "order": 1
+        },
+        {
+          "title": "ScriptControl Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{DATA:device_name}, File Path: %{DATA:file_path}, Interpreter: %{WORD:interpreter}, Interpreter Version: %{DATA:interpreter_version}, Zone Names: \\(%{DATA:zone_names}\\)"
+          },
+          "converters": [],
+          "condition_type": "REGEX",
+          "condition_value": "Event Type: ScriptControl, Event Name: .*, Device Name:",
+          "order": 11
+        },
+        {
+          "title": "Audit Log Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Message: %{GREEDYDATA:message}, User: %{GREEDYDATA:user}"
+          },
+          "converters": [],
+          "condition_type": "REGEX",
+          "condition_value": "Event Type: AuditLog, Event Name:",
+          "order": 10
+        },
+        {
+          "title": "Cylance Threat Extractor",
+          "type": "GROK",
+          "cursor_strategy": "COPY",
+          "target_field": "",
+          "source_field": "message",
+          "configuration": {
+            "grok_pattern": "Event Type: %{WORD:event_type}, Event Name: %{WORD:event_name}, Device Name: %{DATA:device_name}, IP Address: \\(%{IP:ip_address}(, %{IPV6:ip_address_6})*\\), File Name: %{DATA:file_name}, Path: %{DATA:path}, Drive Type: %{DATA:drive_type}, SHA256: %{WORD:sha256}, MD5: %{WORD:md5}, Status: %{WORD:status}, Cylance Score: %{WORD:cylance_score}, Found Date: %{DATESTAMP2:found_date}, File Type: %{WORD:file_type}, Is Running: %{WORD:is_running}, Auto Run: %{WORD:auto_run}, Detected By: %{WORD:detected_by}, Zone Names: \\(%{DATA:zone_names}\\)"
+          },
+          "converters": [],
+          "condition_type": "STRING",
+          "condition_value": "Threat",
+          "order": 6
+        }
+      ]
+    }
+  ],
+  "streams": [],
+  "outputs": [],
+  "dashboards": [],
+  "grok_patterns": [
+    {
+      "name": "DATESTAMP2",
+      "pattern": "(%{DATE}[- ]%{TIME} ([AaPp][Mm]))"
+    }
+  ]
 }
